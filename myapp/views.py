@@ -32,17 +32,20 @@ def registro_user(request):
                 backend = 'myapp.backends.EmailBackend'  # Cambia a la ruta correcta si es necesario
                 user.backend = backend  # Establece el backend
                 login(request, user)  # Iniciar sesión automáticamente después de registrar
-                return redirect('inicio')  # Redirigir a la página de inicio
+
+                # Almacenar el nombre en la sesión
+                request.session['nombre_usuario'] = form.cleaned_data['nombre']  # Almacena el nombre en la sesión
+
+                return redirect('dashboard_cliente')  # Redirigir a la página del dashboard
             except IntegrityError:
-                # Captura el error de integridad y pasa el mensaje al contexto
                 form.add_error('email', 'Este correo electrónico ya ha sido registrado en otra cuenta.')
-                # El usuario permanecerá en la página de registro con el error mostrado
         else:
-            print(form.errors)  # Esto te ayudará a ver los errores en el formulario
+            print(form.errors)
     else:
         form = RegistroUserForm()
     
     return render(request, 'registro_user.html', {'form': form})
+
 # Vista protegida para el carrito
 @login_required
 def carrito(request):
@@ -60,8 +63,10 @@ def formulario(request):
 
 @login_required
 def dashboard_cliente(request):
-    usuario = request.session.get("usuario", "cpazro")
-    return render(request, "dashboard_cliente.html", {"usuario": usuario})
+    nombre_usuario = request.session.get("nombre_usuario", "Usuario").capitalize()  # Obtiene el nombre de la sesión
+    return render(request, "dashboard_cliente.html", {"usuario": nombre_usuario})
+
+
 
 # Vista para listar clientes (solo para superusuarios)
 @user_passes_test(lambda u: u.is_superuser)

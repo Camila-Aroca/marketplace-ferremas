@@ -51,7 +51,8 @@
       </nav>
 
 <div class="container mt-5">
-        <h4 style="text-align: center; margin-top: 40px;">Hola 👋 {{request.user.get_full_name}}</h4>
+        <h4 style="text-align: center; margin-top: 40px;">Hola 👋 {{ usuario }}</h4>
+        <!--<h4 style="text-align: center; margin-top: 40px;">Hola 👋 {{request.user.get_full_name}}</h4>-->
         <h5 style="text-align: center; margin-top: 40px;">Bienvenido al Dashboard {% if request.user.is_superuser %} de Admin {% endif %}</h4>
         <br>
     <div class="d-flex justify-content-center row">
