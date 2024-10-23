@@ -42,13 +42,13 @@
 </head>
 
 <body>
-<!--Nav bar es un placeholder, después ponemos la misma en todas las páginas-->
-<nav class="navbar navbar-light bg-light">
+
+
+<nav class="navbar" style="background-color: rgb(173, 173, 173);">
         <a class="navbar-brand" href="{% url 'inicio' %}">
-            <img src="{% static 'ferremas-logo-nom.png' %}" width="200" height="100" class="d-inline-block align-top mx-3" alt="Logo tienda">
+                <img src="{% static 'ferremas-logo-nom.png' %}" width="200" height="100" class="d-inline-block align-top mx-3" alt="Logo tienda">
         </a>
-        <a style="padding-right: 100px;">{{request.user.get_full_name}}</a>
-      </nav>
+</nav>
 
 <div class="container mt-5">
         <h4 style="text-align: center; margin-top: 40px;">Hola 👋 {{ usuario }}</h4>
@@ -104,15 +104,9 @@
 
 
 <footer class="bg-body-tertiary text-center text-lg-start">
-        <p style="text-align: center;"><a href="#">Back to top</a></p>
-        <p style="text-align: center;">&copy; 2024 Tienda de Ropa</p>
-        <p style="text-align: center;">Contactanos: Teléfono: 123-456-7890 | Correo: info@example.com</p>
-        <p style="text-align: center;">Siguenos en nuestras redes:
-        <a class="text-light" href="https://www.instagram.com/" target="_blank"><i class="fab fa-instagram fa-sm fa-fw me-2"></i></a>
-                                <a class="text-light" href="https://twitter.com/" target="_blank"><i class="fab fa-twitter fa-sm fa-fw me-2"></i></a>
-                                <a class="text-light" href="https://www.linkedin.com/" target="_blank"><i class="fab fa-linkedin fa-sm fa-fw"></i></a>
-                        </p>
-    <!-- Este footer es un placeholder, la idea es después poner el mismo en todas las páginas -->
-    </footer>
+        <p style="text-align: center;"><a href="#">Volver al inicio</a></p>
+        <p style="text-align: center;">&copy; 2024 Ferremas</p>
+        <p style="text-align: center;">Contactanos: Teléfono: 123-456-7890 | Correo: info@ferremas.cl</p>
+</footer>
 </body>
 </html>
