@@ -77,6 +77,45 @@
                 <img src="{% static 'ferremas-logo.png' %}" class="img-fluid rounded-3" alt="Logo" width="80" height="80">
                 <h4 class="mt-1 mb-5 pb-1">Registro de Usuario</h4>
               </div>
+                <form action="{% url 'registro-user' %}" method="POST">
+                  <p><b>Por favor ingrese a su cuenta</b></p>
+                  <div class="form-outline mb-4">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    {% if form.nombre.errors %}
+                      <div class="alert alert-danger">
+                        {{ form.nombre.errors|join:", " }}
+                      </div>
+                    {% endif %}
+                    {% if form.apellido_paterno.errors %}
+                      <div class="alert alert-danger">
+                        {{ form.apellido_paterno.errors|join:", " }}
+                      </div>
+                    {% endif %}
+                    {% if form.apellido_materno.errors %}
+                      <div class="alert alert-danger">
+                        {{ form.apellido_materno.errors|join:", " }}
+                      </div>
+                    {% endif %}
+                    {% if form.telefono.errors %}
+                      <div class="alert alert-danger">
+                        {{ form.telefono.errors|join:", " }}
+                      </div>
+                    {% endif %}
+                    {% if form.terminos.errors %}
+                      <div class="alert alert-danger">
+                        {{ form.terminos.errors|join:", " }}
+                      </div>
+                    {% endif %}
+                  </div>
+                  <br>
+                  <button class="btn btn-primary btn-block fa-lg gradient-custom-2 mb-3" type="submit">Registrar</button>
+                  <a href="{% url 'login' %}">
+                    <button class="btn btn-danger btn-block fa-lg gradient-custom-2 mb-3" type="button">Volver a Login</button>
+                  </a>
+                </form>
+            
+              <!---
               <form action="{% url 'registro-user' %}" method="POST">
                 <p><b>Por favor ingrese a su cuenta</b></p>
                 <div class="form-outline mb-4">
@@ -93,7 +132,7 @@
                 <a href="{% url 'login' %}">
                     <button class="btn btn-danger btn-block fa-lg gradient-custom-2 mb-3" type="button">Volver a Login</button>
                 </a>
-              </form> <!-- Cierra el formulario aquí -->
+              </form> -->
             </div>
           </div>
         </div>

@@ -6,7 +6,30 @@ from django.contrib.auth.models import User
 from django.core.validators import EmailValidator
 from .models import Cliente, TipoTarjeta, Tarjeta
 
+
 class RegistroUserForm(UserCreationForm):
+    email = forms.EmailField(required=True)
+    nombre = forms.CharField(required=True)
+    apellido_paterno = forms.CharField(required=True)
+    apellido_materno = forms.CharField(required=True)
+    telefono = forms.CharField(required=True, max_length=12, widget=forms.TextInput(attrs={'placeholder': 'Número de teléfono (Ej: 123456789)'}))
+    aceptar_terminos = forms.BooleanField(required=True)
+
+    class Meta:
+        model = User
+        fields = ("email", "nombre", "apellido_paterno", "apellido_materno", "telefono", "password1", "password2")
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.email = self.cleaned_data['email']
+        user.username = self.cleaned_data['email']  # Usar el email como username
+        if commit:
+            user.save()
+            # Aquí puedes crear una instancia de Cliente si es necesario
+            # Cliente.objects.create(user=user, nombre=self.cleaned_data['nombre'], ...)
+        return user
+
+'''class RegistroUserForm(UserCreationForm):
     email = forms.EmailField(required=True)
 
     class Meta:
@@ -19,7 +42,7 @@ class RegistroUserForm(UserCreationForm):
         user.username = self.cleaned_data['email']  # Usar el email como username
         if commit:
             user.save()
-        return user
+        return user'''
 
 class ClienteForm(forms.ModelForm):
     class Meta:
