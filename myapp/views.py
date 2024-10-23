@@ -27,7 +27,10 @@ def registro_user(request):
         form = RegistroUserForm(request.POST)
         if form.is_valid():
             try:
-                user = form.save()
+                user = form.save(commit=False)  # No guarda el usuario todavía
+                user.username = form.cleaned_data['email']  # Usa el email como nombre de usuario
+                user.save()  # Guarda el usuario
+
                 # Asegúrate de especificar el backend
                 backend = 'myapp.backends.EmailBackend'  # Cambia a la ruta correcta si es necesario
                 user.backend = backend  # Establece el backend
@@ -43,8 +46,10 @@ def registro_user(request):
             print(form.errors)
     else:
         form = RegistroUserForm()
-    
+
     return render(request, 'registro_user.html', {'form': form})
+
+
 
 # Vista protegida para el carrito
 @login_required
