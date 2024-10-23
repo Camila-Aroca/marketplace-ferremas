@@ -17,51 +17,6 @@
       background-repeat: no-repeat;
     }
   </style>
-<!-- Commented out the script code -->
-<!--
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    var payButton = document.getElementById('btnLogin');
-    payButton.addEventListener('click', function() {
-      var inputEmail = document.getElementById('inputEmail').value.trim();
-      var emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
-      var inputClave = document.getElementById('inputClave').value.trim();
-      var claveRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()-_=+{};:,<.>]).{12,}$/;
-
-
-      if (inputEmail === '' || inputClave === '') {
-        alert('Por favor, complete todos los campos.');
-        return;
-      }
-
-      if (!emailRegex.test(inputEmail)) {
-        alert('Por favor, ingrese un mail en el formato correcto.');
-        return;
-      }
-
-      if (!claveRegex.test(inputClave)) {
-        alert('Por favor, ingrese una contraseña en el formato correcto.');
-        return;
-      }
-
-      // Redirect to inicio.html only if both fields are filled and email is in the correct format
-      window.location.href = "{% url 'inicio' %}";
-
-    });
-
-      //Funcion para mostrar contraseña
-      var mostrarContraseñaCheckbox = document.getElementById('mostrarContraseñaCheckbox');
-      mostrarContraseñaCheckbox.addEventListener('change', function() {
-        var inputClave = document.getElementById('inputClave');
-        if (mostrarContraseñaCheckbox.checked) {
-          inputClave.type = 'text';
-        } else {
-          inputClave.type = 'password';
-        }
-    });
-  });
-</script>
--->
 
 </head>
 <body>

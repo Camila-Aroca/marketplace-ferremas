@@ -1,78 +1,56 @@
 from django.shortcuts import render, HttpResponse, get_object_or_404, redirect
-from .models import TodoItem
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.contrib.auth import authenticate
-from django.contrib.auth import login
-from django.contrib.auth.forms import UserCreationForm
-from .forms import RegistroUserForm
-from .forms import CustomUserCreationForm
-from .forms import ClienteForm, TipoTarjetaForm, TarjetaForm
+from django.contrib.auth import login, authenticate
+from django.contrib.auth.forms import AuthenticationForm
 from django.db import connection
-from .models import TodoItem, Cliente, TipoTarjeta, Tarjeta
+from .models import Cliente, TipoTarjeta, Tarjeta, TodoItem
+from .forms import RegistroUserForm, ClienteForm, TipoTarjetaForm, TarjetaForm
+from django.contrib.auth import get_user_model  # Importar get_user_model
+from django.db import IntegrityError
 
 
-# Create your views here.
+# Página de inicio
 def home(request):
     return render(request, "home.html")
 
-from django.contrib.auth.forms import UserCreationForm
-
+# Vista protegida por login que muestra todos los elementos
 @login_required
 def todos(request):
-
-    request.session ["usuario"] = "cpazro"
-    usuario=request.session.get("usuario")
-    context = {"usuario": usuario}
-
+    usuario = request.session.get("usuario", "cpazro")
     items = TodoItem.objects.all()
-    return render(request, "todos.html", {"todos": items})
-    return render(request, "todos.html", context)
+    return render(request, "todos.html", {"todos": items, "usuario": usuario})
+
+# Registro de usuario con email
 
 def registro_user(request):
     if request.method == 'POST':
-        form = RegistroUserForm(request.POST)  # Usa el formulario de registro
+        form = RegistroUserForm(request.POST)
         if form.is_valid():
-            user = form.save()  # Guarda el usuario
-            login(request, user)  # Inicia sesión al usuario
-            return redirect('/accounts/login/')  # Redirige a la página de inicio de sesión
+            try:
+                user = form.save()
+                # Asegúrate de especificar el backend
+                backend = 'myapp.backends.EmailBackend'  # Cambia a la ruta correcta si es necesario
+                user.backend = backend  # Establece el backend
+                login(request, user)  # Iniciar sesión automáticamente después de registrar
+                return redirect('inicio')  # Redirigir a la página de inicio
+            except IntegrityError:
+                # Captura el error de integridad y pasa el mensaje al contexto
+                form.add_error('email', 'Este correo electrónico ya ha sido registrado en otra cuenta.')
+                # El usuario permanecerá en la página de registro con el error mostrado
+        else:
+            print(form.errors)  # Esto te ayudará a ver los errores en el formulario
     else:
-        form = RegistroUserForm()  # Crea una instancia vacía del formulario
-
+        form = RegistroUserForm()
+    
     return render(request, 'registro_user.html', {'form': form})
-
-# def registro_user(request):
-#     if request.method == "POST":
-#         form = RegistroUserForm(request.POST)
-#         if form.is_valid():
-#             form.save()
-#             username = form.cleaned_data.get("username")
-#             password = form.cleaned_data.get("password1")
-#             user = authenticate(username=username, password=password)
-#             login(request, user)
-#             return HttpResponse("Usuario creado")
-#             messages.success(request, 'Success')
-
-#     else:
-#         form = RegistroUserForm()
-#         form = CustomUserCreationForm()
-
-#     return render(request, 'registro_user.html', {'form': form})
-
+# Vista protegida para el carrito
 @login_required
 def carrito(request):
     return render(request, "carrito.html")
 
+# Inicio de sesión
 def inicio(request):
     return render(request, "inicio.html")
-
-def inicio2(request):
-    return render(request, "inicio2.html")
-
-def login(request, user):
-    return render(request, "login.html")
-
-def login2(request, user):
-    return render(request, "login2.html")
 
 def despliegue(request):
     return render(request, "despliegue_producto.html")
@@ -82,46 +60,26 @@ def formulario(request):
 
 @login_required
 def dashboard_cliente(request):
+    usuario = request.session.get("usuario", "cpazro")
+    return render(request, "dashboard_cliente.html", {"usuario": usuario})
 
-    request.session ["usuario"] = "cpazro"
-    usuario=request.session.get("usuario")
-    context = {"usuario": usuario}
-
-    return render(request, "dashboard_cliente.html")
-
-#cami
+# Vista para listar clientes (solo para superusuarios)
 @user_passes_test(lambda u: u.is_superuser)
 def lista_clientes(request):
-    with connection.cursor() as cursor:
-        cursor.execute("SELECT id, nombre, genero, fecha_nacimiento, clave, correo, es_miembro FROM myapp_cliente")
-        #clientes = cursor.fetchall()
-        clientes = Cliente.objects.all()
-    context = {'clientes': clientes}
-   #return render(request, 'lista_clientes.html', context)
+    clientes = Cliente.objects.all()
     return render(request, 'lista_clientes.html', {'clientes': clientes})
 
-
+# Vista para listar tarjetas
+@user_passes_test(lambda u: u.is_superuser)
 def lista_tarjeta(request):
-    with connection.cursor() as cursor:
-        cursor.execute("""
-            SELECT t.numero_tarjeta, t.cvv, tt.descripcion AS tipo_tarjeta, c.nombre AS cliente
-            FROM myapp_tarjeta t
-            JOIN myapp_tipotarjeta tt ON t.tipo_id = tt.id_tipo
-            JOIN myapp_cliente c ON t.cliente_id = c.id
-        """)
-        tarjetas = Tarjeta.objects.select_related('tipo', 'cliente').all()
-        #tarjetas = cursor.fetchall()
-    context = {'tarjetas': tarjetas}
-    return render(request, 'lista_tarjeta.html', context)
+    tarjetas = Tarjeta.objects.select_related('tipo', 'cliente').all()
+    return render(request, 'lista_tarjeta.html', {'tarjetas': tarjetas})
 
+# Vista para listar tipos de tarjeta
 @user_passes_test(lambda u: u.is_superuser)
 def lista_tipo_tarjeta(request):
-    with connection.cursor() as cursor:
-        cursor.execute("SELECT id_tipo, descripcion FROM myapp_tipotarjeta")
-        #tipos_tarjeta = cursor.fetchall()
-        tipos_tarjeta = TipoTarjeta.objects.all()
-    context = {'tipos_tarjeta': tipos_tarjeta}
-    return render(request, 'lista_tipo_tarjeta.html', context)
+    tipos_tarjeta = TipoTarjeta.objects.all()
+    return render(request, 'lista_tipo_tarjeta.html', {'tipos_tarjeta': tipos_tarjeta})
 
 # Vista para añadir Cliente
 @login_required
@@ -130,7 +88,7 @@ def add_cliente(request):
         form = ClienteForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('lista_clientes')  # Redirige a la vista de listar clientes
+            return redirect('lista_clientes')
     else:
         form = ClienteForm()
     return render(request, 'add_cliente.html', {'form': form})
@@ -142,7 +100,7 @@ def add_tipo_tarjeta(request):
         form = TipoTarjetaForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('lista_tipo_tarjeta')  # Redirige a la vista de listar tipo_tarjetas
+            return redirect('lista_tipo_tarjeta')
     else:
         form = TipoTarjetaForm()
     return render(request, 'add_tipo_tarjeta.html', {'form': form})
@@ -154,7 +112,7 @@ def add_tarjeta(request):
         form = TarjetaForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('lista_tarjeta')  # Redirige a la vista de listar tarjetas
+            return redirect('lista_tarjeta')
     else:
         form = TarjetaForm()
     return render(request, 'add_tarjeta.html', {'form': form})
@@ -167,7 +125,7 @@ def edit_cliente(request, id):
         form = ClienteForm(request.POST, instance=cliente)
         if form.is_valid():
             form.save()
-            return redirect('lista_clientes')  # Redirige a la vista de listar clientes
+            return redirect('lista_clientes')
     else:
         form = ClienteForm(instance=cliente)
     return render(request, 'edit_cliente.html', {'form': form})
@@ -180,10 +138,9 @@ def edit_tipo_tarjeta(request, id_tipo):
         form = TipoTarjetaForm(request.POST, instance=tipo_tarjeta)
         if form.is_valid():
             form.save()
-            return redirect('lista_tipo_tarjeta')  # Redirige a la vista de listar tipo_tarjetas
+            return redirect('lista_tipo_tarjeta')
     else:
         form = TipoTarjetaForm(instance=tipo_tarjeta)
-    print(f"Tipo de Tarjeta a Editar: {tipo_tarjeta}")
     return render(request, 'edit_tipo_tarjeta.html', {'form': form})
 
 # Vista para editar Tarjeta
@@ -194,7 +151,7 @@ def edit_tarjeta(request, numero_tarjeta):
         form = TarjetaForm(request.POST, instance=tarjeta)
         if form.is_valid():
             form.save()
-            return redirect('lista_tarjeta')  # Redirige a la vista de listar tarjetas
+            return redirect('lista_tarjeta')
     else:
         form = TarjetaForm(instance=tarjeta)
     return render(request, 'edit_tarjeta.html', {'form': form})
@@ -205,7 +162,7 @@ def delete_cliente(request, id):
     cliente = get_object_or_404(Cliente, id=id)
     if request.method == 'POST':
         cliente.delete()
-        return redirect('lista_clientes')  # Redirige a la vista de listar clientes
+        return redirect('lista_clientes')
     return render(request, 'delete_cliente.html', {'cliente': cliente})
 
 # Vista para eliminar TipoTarjeta
@@ -214,7 +171,7 @@ def delete_tipo_tarjeta(request, id_tipo):
     tipo_tarjeta = get_object_or_404(TipoTarjeta, id_tipo=id_tipo)
     if request.method == 'POST':
         tipo_tarjeta.delete()
-        return redirect('lista_tipo_tarjeta')  # Redirige a la vista de listar tipo_tarjetas
+        return redirect('lista_tipo_tarjeta')
     return render(request, 'delete_tipo_tarjeta.html', {'tipo_tarjeta': tipo_tarjeta})
 
 # Vista para eliminar Tarjeta
@@ -223,5 +180,5 @@ def delete_tarjeta(request, numero_tarjeta):
     tarjeta = get_object_or_404(Tarjeta, numero_tarjeta=numero_tarjeta)
     if request.method == 'POST':
         tarjeta.delete()
-        return redirect('lista_tarjeta')  # Redirige a la vista de listar tarjetas
+        return redirect('lista_tarjeta')
     return render(request, 'delete_tarjeta.html', {'tarjeta': tarjeta})

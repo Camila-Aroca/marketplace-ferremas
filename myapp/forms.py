@@ -7,26 +7,19 @@ from django.core.validators import EmailValidator
 from .models import Cliente, TipoTarjeta, Tarjeta
 
 class RegistroUserForm(UserCreationForm):
-    email = forms.EmailField()
-    first_name = forms.CharField(max_length=40)
-    last_name = forms.CharField(max_length=40)
+    email = forms.EmailField(required=True)
 
     class Meta:
         model = User
-        fields = ["username", "email", "first_name", "last_name", "password1", "password2"]
+        fields = ("email", "password1", "password2")
 
-class CustomUserCreationForm(UserCreationForm):
-    # Customizing the username field
-    username = forms.CharField(
-        max_length=150,
-        required=True,
-        help_text='awa de uwu',
-        validators=[EmailValidator()],  # Example customization: enforce email format
-        error_messages={
-            'required': "Username is required.",
-            'unique': "A user with that username already exists.",
-        },
-    )
+    def save(self, commit=True):
+        user = super(RegistroUserForm, self).save(commit=False)
+        user.email = self.cleaned_data['email']
+        user.username = self.cleaned_data['email']  # Usar el email como username
+        if commit:
+            user.save()
+        return user
 
 class ClienteForm(forms.ModelForm):
     class Meta:

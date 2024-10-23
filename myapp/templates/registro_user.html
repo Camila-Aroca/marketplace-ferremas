@@ -26,7 +26,6 @@
       var inputClave = document.getElementById('inputClave').value.trim();
       var claveRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()-_=+{};:,<.>]).{12,}$/;
 
-
       if (inputEmail === '' || inputClave === '') {
         alert('Por favor, complete todos los campos.');
         return;
@@ -47,7 +46,7 @@
 
     });
 
-      //Funcion para mostrar contraseña
+      // Funcion para mostrar contraseña
       var mostrarContraseñaCheckbox = document.getElementById('mostrarContraseñaCheckbox');
       mostrarContraseñaCheckbox.addEventListener('change', function() {
         var inputClave = document.getElementById('inputClave');
@@ -63,9 +62,8 @@
 </head>
 <body>
   <!--Nav bar es un placeholder, después ponemos la misma en todas las páginas-->
-  <nav class="navbar navbar-dark" style="background-color: gray;"></nav>
+  <nav class="navbar" style="background-color: rgb(173, 173, 173);">
     <a class="navbar-brand" href="{% url 'inicio' %}">
-
       <img src="{% static 'ferremas-logo-nom.png' %}" width="200" height="100" class="d-inline-block align-top mx-3" alt="Logo tienda">
     </a>
   </nav>
@@ -79,21 +77,23 @@
                 <img src="{% static 'ferremas-logo.png' %}" class="img-fluid rounded-3" alt="Logo" width="80" height="80">
                 <h4 class="mt-1 mb-5 pb-1">Registro de Usuario</h4>
               </div>
-              {% block content %}
               <form action="{% url 'registro-user' %}" method="POST">
                 <p><b>Por favor ingrese a su cuenta</b></p>
-                <!--INCLUIR VALIDACION-->
                 <div class="form-outline mb-4">
-                  {% csrf_token %}
-                  {{ form.as_p }}
-                  {% endblock %}
-                  <br>
-                  <button class="btn btn-primary btn-block fa-lg gradient-custom-2 mb-3" type="submit">Registrar</button>
-                  <a href="{% url 'login' %}">
-                    <button class="btn btn-danger btn-block fa-lg gradient-custom-2 mb-3" type="button">Volver a Login</button>
-                  </a>
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    {% if form.email.errors %}
+                        <div class="alert alert-danger">
+                            {{ form.email.errors|join:", " }}
+                        </div>
+                    {% endif %}
                 </div>
-              </form>
+                <br>
+                <button class="btn btn-primary btn-block fa-lg gradient-custom-2 mb-3" type="submit">Registrar</button>
+                <a href="{% url 'login' %}">
+                    <button class="btn btn-danger btn-block fa-lg gradient-custom-2 mb-3" type="button">Volver a Login</button>
+                </a>
+              </form> <!-- Cierra el formulario aquí -->
             </div>
           </div>
         </div>

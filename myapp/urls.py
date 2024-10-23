@@ -7,7 +7,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("carrito/todos/", views.todos, name="todos"),
     path("carrito/", views.carrito, name="carrito"),
-    path("carrito/inicio2/", views.inicio2, name="inicio2"),
+    #path("carrito/inicio2/", views.inicio2, name="inicio2"),
     path("carrito/inicio/", views.inicio, name="inicio"),
     path("carrito/despliegue-producto/", views.despliegue, name="despliegue-producto"),
     path("carrito/formulario-producto/", views.formulario, name="formulario-producto"),

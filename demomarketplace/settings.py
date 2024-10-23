@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'myapp'
+    'myapp'  # Incluye el nombre de tu aplicación
 ]
 
 MIDDLEWARE = [
@@ -124,3 +124,13 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Custom authentication backends
+AUTHENTICATION_BACKENDS = [
+    'myapp.backends.EmailBackend',  # Reemplaza 'myapp' con el nombre de tu aplicación si es diferente
+    'django.contrib.auth.backends.ModelBackend',  # Mantén el backend por defecto para evitar problemas
+]
+
+# Indicamos que el campo único es el email y no el username
+AUTH_USER_MODEL = 'auth.User'
